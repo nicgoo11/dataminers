@@ -1,0 +1,32 @@
+{
+  "Comment": "AWS Step Function - Loop Lambda Function Until Current Date",
+  "StartAt": "InvokeLambda",
+  "States": {
+    "InvokeLambda": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:284527520868:function:etl_pipeline",
+      "Next": "CheckDate"
+    },
+    "CheckDate": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.isToday",
+          "BooleanEquals": true,
+          "Next": "Completed"
+        }
+      ],
+      "Default": "WaitState"
+    },
+    "WaitState": {
+      "Type": "Wait",
+      "Seconds": 5,
+      "Next": "InvokeLambda"
+    },
+    "Completed": {
+      "Type": "Pass",
+      "Result": "All data processed up to current date",
+      "End": true
+    }
+  }
+}
